@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Peace Animation</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: black;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .peace {
+      position: absolute;
+      font-weight: bold;
+      animation:
+        float 6s linear infinite,
+        colorChange 3s linear infinite,
+        glow 2s ease-in-out infinite alternate,
+        scaleUp 3s ease-in-out infinite alternate;
+      user-select: none;
+      pointer-events: none;
+      font-family: 'Segoe UI', sans-serif;
+      text-shadow: 0 0 10px white;
+    }
+
+    #stopBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background: crimson;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      display: none;
+      z-index: 1000;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes colorChange {
+      0%   { color: #ff4d4d; }
+      20%  { color: #ffcc00; }
+      40%  { color: #33cc33; }
+      60%  { color: #33ccff; }
+      80%  { color: #cc66ff; }
+      100% { color: #ff4d4d; }
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 5px #fff, 0 0 10px #ff00cc, 0 0 15px #ff00cc;
+      }
+      to {
+        text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+      }
+    }
+
+    @keyframes scaleUp {
+      0% { transform: scale(1) rotate(0deg); }
+      100% { transform: scale(1.5) rotate(5deg); }
+    }
+  </style>
+</head>
+<body>
+
+<button id="stopBtn">Tắt hiệu ứng</button>
+
+<audio id="bgMusic" loop>
+  <source src="https://cdn.pixabay.com/audio/2022/03/16/audio_1f0c4e4594.mp3" type="audio/mpeg">
+  Trình duyệt không hỗ trợ audio.
+</audio>
+
+<script>
+  let effectInterval;
+  const music = document.getElementById('bgMusic');
+  const stopBtn = document.getElementById('stopBtn');
+  let hasStarted = false;
+
+  // Tạo chữ Peace bay
+  function createPeace(x = null, y = null) {
+    const peace = document.createElement("div");
+    peace.className = "peace";
+    peace.textContent = "Peace";
+
+    peace.style.left = x !== null ? x + "px" : Math.random() * window.innerWidth + "px";
+    peace.style.top = y !== null ? y + "px" : Math.random() * window.innerHeight + "px";
+    peace.style.fontSize = (Math.random() * 40 + 20) + "px";
+
+    document.body.appendChild(peace);
+
+    setTimeout(() => peace.remove(), 6000);
+  }
+
+  // Lặp tạo chữ tự động
+  function startEffect() {
+    if (hasStarted) return;
+    hasStarted = true;
+
+    effectInterval = setInterval(() => createPeace(), 200);
+    music.play().catch(() => {});  // ignore autoplay error
+
+    // Hiện nút tắt sau 10 giây
+    setTimeout(() => stopBtn.style.display = "block", 10000);
+  }
+
+  // Khi chạm / click lần đầu
+  window.addEventListener("click", (e) => {
+    startEffect();
+    createPeace(e.clientX, e.clientY);
+  });
+
+  window.addEventListener("touchstart", (e) => {
+    startEffect();
+    const touch = e.touches[0];
+    createPeace(touch.clientX, touch.clientY);
+  });
+
+  // Dừng hiệu ứng
+  stopBtn.addEventListener("click", () => {
+    clearInterval(effectInterval);
+    music.pause();
+    document.querySelectorAll(".peace").forEach(p => p.remove());
+    stopBtn.remove();
+  });
+</script>
+
+</body>
+</html>
